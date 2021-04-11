@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const list = require('../../model/index')
+const { validateContact } = require('../../validation/validation')
 
 router.get('/', async (req, res, next) => {
   const readList = await list.listContacts()
@@ -29,16 +30,7 @@ router.get('/:contactId', async (req, res, next) => {
   }
 })
 
-router.post('/', async (req, res, next) => {
-  const { name, email, phone } = req.body
-  if (name === '' || email === '' || phone === '') {
-    res.json({
-      status: '400',
-      code: 400,
-      message: 'missing required name field',
-    })
-    return
-  }
+router.post('/', validateContact, async (req, res, next) => {
   const listAdd = await list.addContact(req.body)
   res.status(201).json({
     status: 'success',
@@ -65,38 +57,15 @@ router.delete('/:contactId', async (req, res, next) => {
   }
 })
 
-router.put('/:contactId', async (req, res, next) => {
-  const { name, email, phone } = req.body
+router.put('/:contactId', validateContact, async (req, res, next) => {
   const { contactId } = await req.params
   const putContacts = await list.updateContact(contactId, req.body)
-  if (
-    name === '' ||
-    email === '' ||
-    phone === '' ||
-    Object.keys(req.body).length === 0
-  ) {
-    res.json({
-      status: 400,
-      code: 400,
-      message: 'missing fields',
-    })
-    return
-  } else if (!putContacts) {
-    res.json({
-      status: 404,
-      code: 404,
-      message: 'Not found',
-    })
 
-    return
-  } else {
-    res.json({
-      status: 'success',
-
-      code: 200,
-      data: putContacts,
-    })
-  }
+  res.json({
+    status: 'success',
+    code: 200,
+    data: putContacts,
+  })
 })
 
 module.exports = router
