@@ -50,14 +50,6 @@ const removeContact = async (contactId) => {
 
 const updateContact = async (contactId, body) => {
   const { name, email, phone } = body
-  if (
-    name === '' ||
-    email === '' ||
-    phone === '' ||
-    Object.keys(body).length === 0
-  ) {
-    return
-  }
   const addListContacts = await fs.readFile(`${contactsPath}`, 'utf8')
   const contactJson = await JSON.parse(addListContacts)
   const contact = await contactJson.filter((data) => `${data.id}` !== contactId)
@@ -75,7 +67,6 @@ const updateContact = async (contactId, body) => {
 module.exports = {
   listContacts,
   getContactById,
-
   removeContact,
   addContact,
   updateContact,
