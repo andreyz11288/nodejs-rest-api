@@ -62,7 +62,6 @@ const updateStatusContact = async (contactId, body) => {
     console.log(error)
   }
 }
-
 module.exports = {
   listContacts,
   getContactById,
