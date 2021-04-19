@@ -11,6 +11,11 @@ const schemaContact = Joi.object({
       tlds: { allow: ['com', 'net'] },
     })
     .required(),
+  favorite: Joi.boolean(),
+})
+
+const schemaFavorite = Joi.object({
+  favorite: Joi.boolean().required(),
 })
 
 const validate = (schema, body, next) => {
@@ -18,18 +23,34 @@ const validate = (schema, body, next) => {
   if (error) {
     const [{ message }] = error.details
     return next({
-      //   code: 500,
       message: {
         status: 'Internal Server Error',
         code: 500,
         message: `Filed: ${message.replace(/"/g, '')} `,
       },
-      //   status: 'Internal Server Error',
+    })
+  }
+  next()
+}
+const validateFav = (schema, body, next) => {
+  const { error } = schema.validate(body)
+  if (error) {
+    return next({
+      message: {
+        status: 'Bad Request',
+        code: 400,
+        message: `Missing field favorite`,
+      },
     })
   }
   next()
 }
 
-module.exports.validateContact = (req, res, next) => {
+const validateContact = (req, res, next) => {
   return validate(schemaContact, req.body, next)
 }
+const validateFavorite = (req, res, next) => {
+  return validateFav(schemaFavorite, req.body, next)
+}
+
+module.exports = { validateContact, validateFavorite }
