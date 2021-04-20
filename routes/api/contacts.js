@@ -5,8 +5,9 @@ const {
   validateContact,
   validateFavorite,
 } = require('../../validation/validation')
+const guard = require('../../helpers/guard')
 
-router.get('/', async (req, res, next) => {
+router.get('/', guard, async (req, res, next) => {
   try {
     const readList = await list.listContacts()
     res.status(200).json({
@@ -19,7 +20,7 @@ router.get('/', async (req, res, next) => {
   }
 })
 
-router.get('/:contactId', async (req, res, next) => {
+router.get('/:contactId', guard, async (req, res, next) => {
   try {
     const { contactId } = await req.params
     const getContactId = await list.getContactById(contactId)
@@ -41,7 +42,7 @@ router.get('/:contactId', async (req, res, next) => {
   }
 })
 
-router.post('/', validateContact, async (req, res, next) => {
+router.post('/', guard, validateContact, async (req, res, next) => {
   try {
     const listAdd = await list.addContact(req.body)
     if (!listAdd) {
@@ -57,7 +58,7 @@ router.post('/', validateContact, async (req, res, next) => {
   }
 })
 
-router.delete('/:contactId', async (req, res, next) => {
+router.delete('/:contactId', guard, async (req, res, next) => {
   try {
     const { contactId } = await req.params
     const deleteContacts = await list.removeContact(contactId)
@@ -79,7 +80,7 @@ router.delete('/:contactId', async (req, res, next) => {
   }
 })
 
-router.put('/:contactId', validateContact, async (req, res, next) => {
+router.put('/:contactId', guard, validateContact, async (req, res, next) => {
   try {
     const { contactId } = await req.params
     const putContacts = await list.updateContact(contactId, req.body)
@@ -96,7 +97,7 @@ router.put('/:contactId', validateContact, async (req, res, next) => {
   }
 })
 
-router.patch('/:contactId', validateFavorite, async (req, res, next) => {
+router.patch('/:contactId', guard, validateFavorite, async (req, res, next) => {
   try {
     const { contactId } = await req.params
     const patchContacts = await list.updateStatusContact(contactId, req.body)
