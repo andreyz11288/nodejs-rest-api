@@ -18,6 +18,16 @@ const schemaFavorite = Joi.object({
   favorite: Joi.boolean().required(),
 })
 
+const schemaUser = Joi.object({
+  email: Joi.string()
+    .email({
+      minDomainSegments: 2,
+      tlds: { allow: ['com', 'net'] },
+    })
+    .required(),
+  password: Joi.string().min(6).max(20).required(),
+})
+
 const validate = (schema, body, next) => {
   const { error } = schema.validate(body)
   if (error) {
@@ -52,5 +62,8 @@ const validateContact = (req, res, next) => {
 const validateFavorite = (req, res, next) => {
   return validateFav(schemaFavorite, req.body, next)
 }
+const validateUser = (req, res, next) => {
+  return validate(schemaUser, req.body, next)
+}
 
-module.exports = { validateContact, validateFavorite }
+module.exports = { validateContact, validateFavorite, validateUser }

@@ -2,8 +2,9 @@ const express = require('express')
 const router = express.Router()
 const guard = require('../../helpers/guard')
 const list = require('../../model/user')
+const { validateUser } = require('../../validation/validation')
 
-router.post('/signup', async (req, res, next) => {
+router.post('/signup', validateUser, async (req, res, next) => {
   const { email, password } = await req.body
   const user = await list.getUsersByEmail(email)
   if (user) {
@@ -25,7 +26,7 @@ router.post('/signup', async (req, res, next) => {
   }
 })
 
-router.post('/login', async (req, res, next) => {
+router.post('/login', validateUser, async (req, res, next) => {
   const { email, password } = await req.body
 
   try {
@@ -47,9 +48,31 @@ router.post('/login', async (req, res, next) => {
 router.post('/logout', guard, async (req, res, next) => {
   try {
     const id = req.user.id
+    const user = await list.getUsersById(id)
+    if (!user) {
+      return res.status(401).json({ message: 'Not authorized' })
+    }
     await list.logout(id)
     return res.status(204).json({
       message: 'No Content',
+    })
+  } catch (error) {
+    next(error)
+  }
+})
+
+router.get('/current', guard, async (req, res, next) => {
+  try {
+    const token = req.user.token
+    const user = await list.getUsersByToken(token)
+    if (!user) {
+      return res.status(401).json({ message: 'Not authorized' })
+    }
+
+    return res.status(200).json({
+      status: 'success',
+      email: req.user.email,
+      subscription: 'starter',
     })
   } catch (error) {
     next(error)

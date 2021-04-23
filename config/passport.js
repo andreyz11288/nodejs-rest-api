@@ -14,7 +14,7 @@ passport.use(
     try {
       const user = await users.getUsersById(payload.id)
       if (!user) {
-        return done(new Error('User not found'))
+        return done(new Error('Not authorized'))
       }
       if (!user.token) {
         return done(null, false)

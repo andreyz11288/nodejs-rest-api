@@ -54,6 +54,12 @@ const logout = async (id) => {
   const data = await updateToken(id, null)
   return data
 }
+
+const getUsersByToken = async (token) => {
+  const data = await Users.findOne({}, { token })
+  return data
+}
+
 module.exports = {
   getUsersById,
   addUsers,
@@ -61,4 +67,5 @@ module.exports = {
   updateToken,
   login,
   logout,
+  getUsersByToken,
 }
