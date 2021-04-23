@@ -44,7 +44,8 @@ router.get('/:contactId', guard, async (req, res, next) => {
 
 router.post('/', guard, validateContact, async (req, res, next) => {
   try {
-    const listAdd = await list.addContact(req.body)
+    const userId = req.user.id
+    const listAdd = await list.addContact(req.body, userId)
     if (!listAdd) {
       return res.status(400).json({ message: 'missing required name field' })
     }

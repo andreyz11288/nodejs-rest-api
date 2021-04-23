@@ -1,6 +1,5 @@
 const Users = require('../schemas/users')
 const jwt = require('jsonwebtoken')
-const passport = require('passport')
 require('dotenv').config()
 const SECRET_KEY = process.env.JWT_SECRET_KEY
 
@@ -32,7 +31,7 @@ const addUsers = async (body) => {
 }
 
 const updateToken = async (id, token) => {
-  await Users.updateOne(id, token)
+  await Users.findByIdAndUpdate(id, { token })
 }
 
 // AuthServise
@@ -46,13 +45,13 @@ const login = async (email, password) => {
   }
   const id = user.id
   const payload = { id }
-  const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '1h' })
-  await Users.findByIdAndUpdate(id, token)
+  const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '7h' })
+  await Users.findByIdAndUpdate(id, { token })
   return token
 }
 
 const logout = async (id) => {
-  const data = await Users.updateToken(id, null)
+  const data = await updateToken(id, null)
   return data
 }
 module.exports = {

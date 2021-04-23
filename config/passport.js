@@ -5,21 +5,21 @@ const SECRET_KEY = process.env.JWT_SECRET_KEY
 const users = require('../model/user')
 
 const params = {
-  secretOrKey: 'secret',
+  secretOrKey: SECRET_KEY,
   jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
 }
 
 passport.use(
   new Strategy(params, async function (payload, done) {
     try {
-      const user = users.getUsersById(payload.id)
-      console.log(user)
+      const user = await users.getUsersById(payload.id)
       if (!user) {
-        return done(Error('User not found'))
+        return done(new Error('User not found'))
       }
       if (!user.token) {
-        return done(null, user)
+        return done(null, false)
       }
+      return done(null, user)
     } catch (err) {
       done(err)
     }

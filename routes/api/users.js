@@ -1,5 +1,6 @@
 const express = require('express')
 const router = express.Router()
+const guard = require('../../helpers/guard')
 const list = require('../../model/user')
 
 router.post('/signup', async (req, res, next) => {
@@ -43,35 +44,16 @@ router.post('/login', async (req, res, next) => {
   }
 })
 
-router.post('/logout', async (req, res, next) => {
+router.post('/logout', guard, async (req, res, next) => {
   try {
-    const listAdd = await list.addUsers(req.body)
-    // if (!listAdd) {
-    //   return res.status(400).json({ message: 'missing required name field' })
-    // }
-    // res.status(201).json({
-    //   status: 'success',
-    //   code: 201,
-    //   data: listAdd,
-    // })
+    const id = req.user.id
+    await list.logout(id)
+    return res.status(204).json({
+      message: 'No Content',
+    })
   } catch (error) {
     next(error)
   }
 })
 
-router.post('/logout', async (req, res, next) => {
-  try {
-    const listUpdateToken = await list.updateToken(req.body)
-    // if (!listAdd) {
-    //   return res.status(400).json({ message: 'missing required name field' })
-    // }
-    // res.status(201).json({
-    //   status: 'success',
-    //   code: 201,
-    //   data: listAdd,
-    // })
-  } catch (error) {
-    next(error)
-  }
-})
 module.exports = router

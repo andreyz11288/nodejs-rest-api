@@ -18,9 +18,13 @@ const getContactById = async (contactId) => {
   }
 }
 
-const addContact = async (body) => {
+const addContact = async (body, userId) => {
   try {
-    const record = { ...body, ...(body.favorite ? {} : { favorite: false }) }
+    const record = {
+      ...body,
+      ...(body.favorite ? {} : { favorite: false }),
+      owner: userId,
+    }
     const result = await Contact.create(record)
     return result
   } catch (error) {
