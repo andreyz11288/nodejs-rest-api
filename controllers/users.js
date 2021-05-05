@@ -22,7 +22,7 @@ const signup = async (req, res, next) => {
       user: {
         email: newUser.email,
         subscription: 'starter',
-        avatar: newUser.avatarURL,
+        avatar: newUser.avatar,
       },
     })
   } catch (error) {
@@ -77,6 +77,7 @@ const current = async (req, res, next) => {
       status: 'success',
       email: req.user.email,
       subscription: 'starter',
+      avatar: req.user.avatar,
     })
   } catch (error) {
     next(error)
@@ -101,11 +102,19 @@ const saveAvatarUser = async (req) => {
     .autocrop()
     .cover(250, 250, jimp.HORIZONTAL_ALIGN_CENTER, jimp.VERTICAL_ALIGN_MIDDLE)
     .writeAsync(pathFile)
-  await fs.rename(
-    pathFile,
-    path.join(process.cwd(), 'public', FOLDER_AVATARS, newNameAvatar)
-  )
-  return path.join(FOLDER_AVATARS, newNameAvatar)
+  try {
+    await fs.rename(
+      pathFile,
+      path.join(process.cwd(), 'public', FOLDER_AVATARS, newNameAvatar)
+    )
+  } catch (error) {
+    console.log(error.message)
+  }
+  const oldAvatar = req.user.avatar
+  if (oldAvatar.includes(`${FOLDER_AVATARS}/`)) {
+    await fs.unlink(path.join(process.cwd(), 'public', oldAvatar))
+  }
+  return path.join(FOLDER_AVATARS, newNameAvatar).replace('\\', '/')
 }
 module.exports = {
   signup,
