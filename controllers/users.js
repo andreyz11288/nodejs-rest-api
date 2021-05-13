@@ -75,6 +75,7 @@ const current = async (req, res, next) => {
 
     return res.status(200).json({
       status: 'success',
+      name: req.user.name,
       email: req.user.email,
       subscription: 'starter',
       avatar: req.user.avatar,
@@ -116,6 +117,23 @@ const saveAvatarUser = async (req) => {
   }
   return path.join(FOLDER_AVATARS, newNameAvatar).replace('\\', '/')
 }
+
+const verificationToken = async (req, res, next) => {
+  try {
+    const user = await list.verificationToken(req.params)
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' })
+    }
+
+    return res.status(200).json({
+      message: 'Verification successful',
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+const verification = async (req, res, next) => {}
+
 module.exports = {
   signup,
   login,
@@ -123,4 +141,6 @@ module.exports = {
   current,
   updateAvatar,
   saveAvatarUser,
+  verificationToken,
+  verification,
 }
