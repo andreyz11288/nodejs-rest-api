@@ -3,6 +3,7 @@ require('dotenv').config()
 const jimp = require('jimp')
 const fs = require('fs/promises')
 const path = require('path')
+const EmailService = require('../Services/email')
 
 const signup = async (req, res, next) => {
   const { email } = await req.body
@@ -16,13 +17,21 @@ const signup = async (req, res, next) => {
   }
   try {
     const newUser = await list.addUsers(req.body)
+    const { id, name, email, avatar, verificationToken } = newUser
+    try {
+      const emailService = new EmailService(process.env.NODE_ENV)
+    await emailService.sendVerifyEmail(verificationToken, email, name)
+    } catch (error) {
+      console.log(error.message);
+    }
     return res.status(201).json({
       status: 'success',
       code: 201,
       user: {
-        email: newUser.email,
+        id,
+        email,
         subscription: 'starter',
-        avatar: newUser.avatar,
+        avatar,
       },
     })
   } catch (error) {
@@ -120,11 +129,11 @@ const saveAvatarUser = async (req) => {
 
 const verificationToken = async (req, res, next) => {
   try {
-    const user = await list.verificationToken(req.params)
+    const user = await list.getUsersByVerifyTokenEmail(req.params.token)
     if (!user) {
       return res.status(404).json({ message: 'User not found' })
     }
-
+    await list.updateTokenVerify(user.id, true, null)
     return res.status(200).json({
       message: 'Verification successful',
     })
@@ -132,7 +141,23 @@ const verificationToken = async (req, res, next) => {
     next(error)
   }
 }
-const verification = async (req, res, next) => {}
+const verification = async (req, res, next) => {
+  try {
+    const user = await list.getUsersByEmail(email)
+    if (user) {
+      
+      const { name, verificationToken, email } = user
+      const emailService = new EmailService(process.env.NODE_ENV)
+      await emailService.sendVerifyEmail(verificationToken, email, name)
+      return res.status(200).json({
+        message: 'Verification email sent'
+      })
+    }
+    return res.status(400).json({ message: 'Verification has already been passed' })
+  } catch (error) {
+    next(error)
+  }
+}
 
 module.exports = {
   signup,

@@ -25,6 +25,6 @@ router.patch('/avatars', guard, uploadAvatar.single('avatar'), updateAvatar)
 
 router.get('/verify/:verificationToken', verificationToken)
 
-router.get('/verify', guard, verification)
+router.post('/verify', verification)
 
 module.exports = router

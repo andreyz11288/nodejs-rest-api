@@ -21,6 +21,15 @@ const getUsersByEmail = async (email) => {
   }
 }
 
+const getUsersByVerifyTokenEmail = async (token) => {
+  try {
+    const result = await Users.findOne({ verifyToken: token })
+    return result
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 const addUsers = async (body) => {
   try {
     const user = new Users(body)
@@ -40,7 +49,7 @@ const login = async (email, password) => {
   const user = await Users.findOne({ email })
 
   const validPasswordUser = await user.validPassword(password)
-  if (!user || !validPasswordUser) {
+  if (!user || !validPasswordUser || !user.verify) {
     return null
   }
   const id = user.id
@@ -65,6 +74,10 @@ const updateAvatar = async (id, avatar) => {
   return data
 }
 
+const updateTokenVerify = async (id, verify, verifyToken) => {
+  await Users.updateOne(id, { verify, verifyToken })
+}
+
 module.exports = {
   getUsersById,
   addUsers,
@@ -74,4 +87,6 @@ module.exports = {
   logout,
   getUsersByToken,
   updateAvatar,
+  updateTokenVerify,
+  getUsersByVerifyTokenEmail
 }
