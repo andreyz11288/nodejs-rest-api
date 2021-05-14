@@ -18,10 +18,9 @@ const signup = async (req, res, next) => {
   try {
     const newUser = await list.addUsers(req.body)
     const { id, name, email, avatar, verifyToken } = newUser
-    console.log('verificationToken:', verifyToken)
     try {
       const emailService = new EmailService(process.env.NODE_ENV)
-      await emailService.sendVerifyEmail(verifyToken, email, name)
+      await emailService.sendVerifyEmail(verifyToken, email)
     } catch (error) {
       console.log(error.message)
     }
@@ -153,7 +152,7 @@ const verification = async (req, res, next) => {
     if (user) {
       const { name, verifyToken, email } = user
       const emailService = new EmailService(process.env.NODE_ENV)
-      await emailService.sendVerifyEmail(verifyToken, email, name)
+      await emailService.sendVerifyEmail(verifyToken, email)
       return res.status(200).json({
         message: 'Verification email sent',
       })

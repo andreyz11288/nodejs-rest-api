@@ -18,7 +18,7 @@ class EmailService {
         break
     }
   }
-  #createTemplateVerifyEmail(verifyToken, name) {
+  #createTemplateVerifyEmail(verifyToken) {
     const mailGenerator = new this.#GenerateTemplate({
       theme: 'neopolitan',
       product: {
@@ -31,7 +31,7 @@ class EmailService {
     })
     const email = {
       body: {
-        name,
+        name: 'Guest',
         intro:
           "Welcome to System contacts! We're very excited to have you on board.",
         action: {
@@ -51,13 +51,13 @@ class EmailService {
     return emailBody
   }
 
-  async sendVerifyEmail(verifyToken, email, name) {
+  async sendVerifyEmail(verifyToken, email) {
     this.#sender.setApiKey(process.env.API_KEY_SENDGRID)
     const msg = {
       to: email,
       from: 'andreyz11288@gmail.com', // Use the email address or domain you verified above
       subject: 'Verify email',
-      html: this.#createTemplateVerifyEmail(verifyToken, name),
+      html: this.#createTemplateVerifyEmail(verifyToken),
     }
     this.#sender.send(msg)
   }
