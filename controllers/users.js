@@ -17,12 +17,13 @@ const signup = async (req, res, next) => {
   }
   try {
     const newUser = await list.addUsers(req.body)
-    const { id, name, email, avatar, verificationToken } = newUser
+    const { id, name, email, avatar, verifyToken } = newUser
+    console.log('verificationToken:', verifyToken)
     try {
       const emailService = new EmailService(process.env.NODE_ENV)
-    await emailService.sendVerifyEmail(verificationToken, email, name)
+      await emailService.sendVerifyEmail(verifyToken, email, name)
     } catch (error) {
-      console.log(error.message);
+      console.log(error.message)
     }
     return res.status(201).json({
       status: 'success',
@@ -129,7 +130,9 @@ const saveAvatarUser = async (req) => {
 
 const verificationToken = async (req, res, next) => {
   try {
-    const user = await list.getUsersByVerifyTokenEmail(req.params.token)
+    const user = await list.getUsersByVerifyTokenEmail(
+      req.params.verificationToken
+    )
     if (!user) {
       return res.status(404).json({ message: 'User not found' })
     }
@@ -143,17 +146,21 @@ const verificationToken = async (req, res, next) => {
 }
 const verification = async (req, res, next) => {
   try {
-    const user = await list.getUsersByEmail(email)
+    if (!req.body.email) {
+      return res.status(400).json({ message: 'missing required field email' })
+    }
+    const user = await list.getUsersByEmail(req.body.email)
     if (user) {
-      
-      const { name, verificationToken, email } = user
+      const { name, verifyToken, email } = user
       const emailService = new EmailService(process.env.NODE_ENV)
-      await emailService.sendVerifyEmail(verificationToken, email, name)
+      await emailService.sendVerifyEmail(verifyToken, email, name)
       return res.status(200).json({
-        message: 'Verification email sent'
+        message: 'Verification email sent',
       })
     }
-    return res.status(400).json({ message: 'Verification has already been passed' })
+    return res
+      .status(400)
+      .json({ message: 'Verification has already been passed' })
   } catch (error) {
     next(error)
   }

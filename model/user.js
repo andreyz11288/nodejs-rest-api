@@ -75,7 +75,7 @@ const updateAvatar = async (id, avatar) => {
 }
 
 const updateTokenVerify = async (id, verify, verifyToken) => {
-  await Users.updateOne(id, { verify, verifyToken })
+  return await Users.updateOne({ _id: id }, { verify, verifyToken })
 }
 
 module.exports = {
@@ -88,5 +88,5 @@ module.exports = {
   getUsersByToken,
   updateAvatar,
   updateTokenVerify,
-  getUsersByVerifyTokenEmail
+  getUsersByVerifyTokenEmail,
 }

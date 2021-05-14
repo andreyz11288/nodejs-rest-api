@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const guard = require('../../helpers/guard')
-const { validateUser } = require('../../validation/validation')
+const { validateUser, validateVerify } = require('../../validation/validation')
 const uploadAvatar = require('../../helpers/upload-avatar')
 const {
   signup,
@@ -25,6 +25,6 @@ router.patch('/avatars', guard, uploadAvatar.single('avatar'), updateAvatar)
 
 router.get('/verify/:verificationToken', verificationToken)
 
-router.post('/verify', verification)
+router.post('/verify', validateVerify, verification)
 
 module.exports = router
